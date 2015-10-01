@@ -1,0 +1,71 @@
+<html>
+	<head>
+		<title>
+		My Angular App!
+		</title>
+		<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular.min.js"></script>-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="angular.min.js"></script>
+		<script src="app.js"></script>
+
+		<style>
+			.glyphicon glyphicon-thumbs-up {cursor: pointer;}
+		</style>
+	</head>
+
+	<body ng-app="flapperNews" ng-controller="MainController">
+
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+				<div class="page-header">
+					<h1>Flapper News</h1>
+				</div>
+
+		<!-- -upvotes want je wil descending order doen -->
+				<div ng-repeat="post in posts | orderBy: '-upvotes'">
+					<span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpvotes(post)"></span>
+
+					{{post.upvotes}}
+
+					<span style="margin-left:10px; font-size:20px">
+						<!-- link showen als ie bestaat -->
+						<a href={{post.link}} ng-show='post.link'>{{post.title}}</a>
+
+						<!-- als je enkel title invult geen link om op te klikken, als link is ingevuld dan kan je wel op een link klikken --> 
+			 			<span ng-hide='post.link'>{{$index}}. {{post.title}}</span>
+			 			
+			 		</span>
+				</div>
+				<br>
+				<form ng-submit="addPost()" style="margin-left:10px;">
+
+					<div class="form-group">
+						<input class = "form-control" placeholder = "Title" type="text" ng-model="title"></input>
+					</div>
+					<div class="form-group">
+						<input class = "form-control" placeholder = "Link" type="text" ng-model="link">
+					</div>
+
+					<!-- placeholder is een nieuw html5 attribuut-->
+					
+					
+					
+					<!--<button ng-click="addPost()">Add a new post!</button>-->
+					<!-- ook ng-submit... toevoegen bij form nu -->
+					<!-- <button type="submit" disabled="disabled">Add a new post!</button> -->
+					<button type="submit">Post</button>
+					<!--
+						button disablen (nu nog ALTIJD disabled, hij moet enkel disabled zijn aje nix int vakske hebt)
+						<button type="submit">Add a new post!</button>
+					-->
+				</form>
+
+					</div>
+				</div>
+
+		
+
+		
+
+	</body>
+</html>
