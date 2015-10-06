@@ -1,4 +1,4 @@
-var app = angular.module('flapperNews', []);
+var app = angular.module('flapperNews', ['ui.router']);
 
 app.controller('MainController', [
 	'$scope',
@@ -22,8 +22,10 @@ app.controller('MainController', [
 				//title: 'A new post', upvotes: 0
 				title: $scope.title, 
 				link : $scope.link,
-				upvotes: 0
-			})
+				upvotes: 0,
+				comments: []
+			});
+
 			$scope.title = "";
 			$scope.link = "";
 		};
@@ -35,6 +37,26 @@ app.controller('MainController', [
 
 	}]);
 
+app.controller('PostsController', [
+	'$scope',
+	'$stateParams',
+	'posts',
+	function($scope, $stateParams, posts){
+		$scope.post = posts.posts[$stateParams.id];
+
+		$scope.addComment = function(){
+			$scope.post.comments.push({
+				author: 'user',
+				body: $scope.body,
+				upvotes: 0
+			});
+
+			$scope.body = '';
+		};
+	}]);
+
+
+
 app.factory('posts', [function(){
 
 		var postFactory = {
@@ -44,3 +66,24 @@ app.factory('posts', [function(){
 		return postFactory;
 
 }]);
+
+app.config([
+	'$stateProvider', 
+	'$urlRouterProvider',
+	function($stateProvider, $urlRouterProvider){
+		$stateProvider
+			.state('home', {
+				url: "/home",
+				templateUrl: "/home.html",
+				controller: "MainController"
+			})
+			.state('posts', {
+				url:"/posts/{id}",
+				templateUrl: "/posts.html",
+				controller : "PostsController"
+			});
+
+		$urlRouterProvider.otherwise('home');
+
+
+	}]);
