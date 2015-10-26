@@ -1,89 +1,80 @@
-var app = angular.module('flapperNews', ['ui.router']);
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
-app.controller('MainController', [
-	'$scope',
-	'posts',
-	function($scope, posts){
-		/*$scope.posts = ['post 1', 'post 2', 'post 3', 'post 4', 'post 5'];*/
+var app = express();
 
-		//creatie post objecten
-		/*$scope.posts = [
-			{title : 'post 1', upvotes : 5},
-			{title : 'post 2', upvotes : 2},
-			{title : 'post 3', upvotes : 15},
-			{title : 'post 4', upvotes : 27},
-			{title : 'post 5', upvotes : 55}
-		];*/
-		$scope.posts = posts.posts;
+var mongoose = require('mongoose');
+var passport = require('passport');
 
-		$scope.addPost = function () {
-			if(!$scope.title || $scope.title === ''){return ;}
-			$scope.posts.push({
-				//title: 'A new post', upvotes: 0
-				title: $scope.title, 
-				link : $scope.link,
-				upvotes: 0,
-				comments: []
-			});
+// connect MongoDB
+mongoose.connect('mongodb://localhost/news', function(err,db){
+    if (!err){
+        console.log('Connected to /news!');
+    } else{
+        console.dir(err); //failed to connect
+    }
+});
 
-			$scope.title = "";
-			$scope.link = "";
-		};
+require('./models/Posts');
+require('./models/Comments');
+require('./models/Users');
+require('./config/passport');
 
-		$scope.incrementUpvotes = function (post) {
-			//console.log('In incrementUpvotes post object:', post);
-			post.upvotes++;
-		};
+var routes = require('./routes/index');
+var users = require('./routes/users');
 
-	}]);
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-app.controller('PostsController', [
-	'$scope',
-	'$stateParams',
-	'posts',
-	function($scope, $stateParams, posts){
-		$scope.post = posts.posts[$stateParams.id];
+// uncomment after placing your favicon in /public
+//app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
 
-		$scope.addComment = function(){
-			$scope.post.comments.push({
-				author: 'user',
-				body: $scope.body,
-				upvotes: 0
-			});
+app.use('/', routes);
+app.use('/users', users);
 
-			$scope.body = '';
-		};
-	}]);
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
 
+// error handlers
 
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
 
-app.factory('posts', [function(){
-
-		var postFactory = {
-			posts : []
-		};
-
-		return postFactory;
-
-}]);
-
-app.config([
-	'$stateProvider', 
-	'$urlRouterProvider',
-	function($stateProvider, $urlRouterProvider){
-		$stateProvider
-			.state('home', {
-				url: "/home",
-				templateUrl: "/home.html",
-				controller: "MainController"
-			})
-			.state('posts', {
-				url:"/posts/{id}",
-				templateUrl: "/posts.html",
-				controller : "PostsController"
-			});
-
-		$urlRouterProvider.otherwise('home');
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
+});
 
 
-	}]);
+module.exports = app;
+
+
