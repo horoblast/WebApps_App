@@ -140,7 +140,8 @@ router.post('/login', function(req, res, next){
   }
 
 console.log('calling passport)');
-  passport.authenticate('local', function(err, user, info){
+
+passport.authenticate('local', function(err, user, info){
     if(err){ return next(err); }
 
     if(user){
