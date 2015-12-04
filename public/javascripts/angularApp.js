@@ -1,4 +1,4 @@
-var app = angular.module('flapperNews', ['ui.router','ngMaterial']);
+var app = angular.module('flapperNews', ['ui.router','ngMaterial', 'ngAnimate']);
 
 app.config(['$stateProvider', '$urlRouterProvider',
 function($stateProvider, $urlRouterProvider) {
@@ -12,7 +12,6 @@ function($stateProvider, $urlRouterProvider) {
 			function(posts) {
 				return posts.getAll();
 			}]
-
 		}
 	}).state('posts', {
 		url : '/posts/:id',
@@ -23,7 +22,6 @@ function($stateProvider, $urlRouterProvider) {
 			function($stateParams, posts) {
 				return posts.get($stateParams.id);
 			}]
-
 		}
 	}).state('login', {
 		url : '/login',
@@ -35,7 +33,6 @@ function($stateProvider, $urlRouterProvider) {
 				$state.go('home');
 			}
 		}]
-
 	}).state('register', {
 		url : '/register',
 		templateUrl : '/register.html',
@@ -46,7 +43,10 @@ function($stateProvider, $urlRouterProvider) {
 				$state.go('home');
 			}
 		}]
-
+	}).state('slider', {
+		url: '/slider',
+		templateUrl: '/sliderTemplate.html',
+		controller: 'SliderCtrl'
 	});
 
 	$urlRouterProvider.otherwise('home');
@@ -179,8 +179,6 @@ function($http, auth) {
 	return o;
 }]);
 
-
-
 app.controller('MainCtrl', ['$scope', 'posts', 'auth',
 function($scope, posts, auth) {
 	$scope.posts = posts.posts;
@@ -274,3 +272,54 @@ app.controller('AppCtrl', ['$scope', '$mdSidenav', function($scope, $mdSidenav){
  
 }]);
 
+/* imageslider directive + bijhorende */
+
+app.directive('slider', function($timeout){
+	return {
+		restrict: 'AE',
+		replace: true,
+		scope: {
+			images: '='
+		},
+		link: function(scope, elements, attributes){}
+	};
+});
+
+app.controller('SliderCtrl', function($scope){
+	$scope.images = [{
+		src: 'rsz_csgo.jpg',
+		title: 'Counter-Strike: Global Offensive'
+	}, {
+		src: 'rsz_fo4.jpg',
+		title: 'Fallout 4'
+	}, {
+		src: 'rsz_ro2.jpg',
+		title: 'Red Orchestra 2: Heroes of Stalingrad'
+	}, {
+		src: 'rsz_sc2.jpg',
+		title: 'Starcraft 2: Legacy of the Void'
+	}, {
+		src: 'rsz_swbf.jpg',
+		title: 'Starwars Battlefront'
+	}];
+
+	$scope.currentIndex  = 0;
+
+	$scope.next = function(){
+		$scope.currentIndex  < $scope.images.length -1 ? $scope.currentIndex ++ : $scope.currentIndex  = 0;
+	};
+
+	$scope.prev = function(){
+		$scope.currentIndex  > 0 ? $scope.currentIndex -- : $scope.currentIndex = $scope.images.length -1;
+	};
+
+	$scope.$watch('currentIndex ', function(){
+		$scope.images.forEach(function(image){
+			image.visible = false;
+		});
+
+		$scope.images[$scope.currentIndex].visible = true;
+	});
+
+	console.log($scope.images);
+});
