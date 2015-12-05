@@ -187,6 +187,8 @@
       <div class="slider">
         <div class="slide" ng-repeat="image in images" ng-show="image.visible">
           <img ng-src="/images/{{image.src}}" />
+          <br>
+          <h1 class="imgtitle">{{image.title}}</h1>
         </div>
         <div class="arrows">
           <a href="#" ng-click="prev()">

@@ -65,3 +65,7 @@ h1 {
 .currentIndex {
   display: inline;
 }
+
+.imgtitle {
+  font-weight: bold;
+}
